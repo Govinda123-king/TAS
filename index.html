@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Allocation System</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <div>
+                <h1>Task Allocation System</h1>
+                <p>Manage student assignments efficiently</p>
+            </div>
+            <button id="help-btn" class="btn btn-secondary btn-sm">How to Use</button>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- Task Entry Form -->
+        <section class="form-section">
+            <div class="card">
+                <h2 id="form-title">Add New Task</h2>
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="title">Task Title</label>
+                        <input type="text" id="title" placeholder="e.g., Database Design" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3" placeholder="Task details..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assignee">Assigned Student</label>
+                        <input type="text" id="assignee" placeholder="e.g., John Doe" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deadline">Deadline</label>
+                        <input type="date" id="deadline" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" id="submit-btn" class="btn btn-primary">Add Task</button>
+                        <button type="button" id="cancel-btn" class="btn btn-secondary hidden">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Task List Display -->
+        <section class="tasks-section">
+            <div class="tasks-header">
+                <h2>Current Tasks</h2>
+                <div class="stats">
+                    <span id="total-tasks">Total: 0</span>
+                    <span id="completed-tasks">Completed: 0</span>
+                </div>
+            </div>
+            
+            <!-- Grid container for task cards -->
+            <div id="task-list" class="task-grid">
+                <!-- Task cards will be injected here by JavaScript -->
+            </div>
+            
+            <!-- Empty state message -->
+            <div id="empty-state" class="empty-state hidden">
+                <p>No tasks found. Add a task to get started!</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content card">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2>How to Use</h2>
+            <div class="modal-body">
+                <ul>
+                    <li><strong>Add a Task:</strong> Fill out the form with the task details and click "Add Task".</li>
+                    <li><strong>Manage Tasks:</strong> Tasks appear in the grid. Use the buttons on each card to mark them as <strong>Complete</strong>, <strong>Edit</strong> their details, or <strong>Delete</strong> them.</li>
+                    <li><strong>Persistence:</strong> Your tasks are saved automatically in your browser. If you refresh or close the page, they will remain saved!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to our vanilla JavaScript file -->
+    <script type="module" src="/script.js"></script>
+
+<script id="dualite-canvas-overlay-v1">
+
+(function() {
+  if (window.__canvasOverlayInit) return;
+  window.__canvasOverlayInit = true;
+
+  try {
+
+  var enabled = false;
+  let hoveredEl = null;
+  let selectedEl = null;
+
+  function getSelector(el) {
+    if (el.id) return '#' + el.id;
+    let path = [];
+    while (el && el !== document.body && el !== document.documentElement) {
+      let tag = el.tagName.toLowerCase();
+      let sibling = el;
+      let nth = 1;
+      while (sibling.previousElementSibling) {
+        sibling = sibling.previousElementSibling;
+        if (sibling.tagName === el.tagName) nth++;
+      }
+      path.unshift(nth > 1 ? tag + ':nth-of-type(' + nth + ')' : tag);
+      el = el.parentElement;
+    }
+    return path.join(' > ');
+  }
+
+  function getRect(el) {
+    const r = el.getBoundingClientRect();
+    return { top: r.top, left: r.left, width: r.width, height: r.height };
+  }
+
+  function getComputedProps(el) {
+    var cs = window.getComputedStyle(el);
+    return {
+      tagName: el.tagName.toLowerCase(),
+      id: el.id || '',
+      className: (typeof el.className === 'string') ? el.className : '',
+      textContent: (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) ? (el.textContent || '').slice(0, 80) : '',
+      fontSize: cs.fontSize,
+      fontWeight: cs.fontWeight,
+      fontFamily: cs.fontFamily,
+      color: cs.color,
+      backgroundColor: cs.backgroundColor,
+      opacity: cs.opacity,
+      textAlign: cs.textAlign,
+      padding: cs.padding,
+      margin: cs.margin,
+      borderRadius: cs.borderRadius,
+      borderWidth: cs.borderWidth,
+      borderColor: cs.borderColor,
+      width: cs.width,
+      height: cs.height,
+      display: cs.display,
+    };
+  }
+
+  function parseDataDs(ds) {
+    var parts = ds.split(':');
+    if (parts.length < 3) return null;
+    var col = parseInt(parts[parts.length - 1], 10);
+    var line = parseInt(parts[parts.length - 2], 10);
+    var filePath = parts.slice(0, parts.length - 2).join(':');
+    if (!filePath || isNaN(line)) return null;
+    return { sourceFilePath: filePath, sourceLine: line, sourceColumn: isNaN(col) ? null : col };
+  }
+
+  function getDebugSource(el) {
+    var node = el;
+    while (node && node !== document.documentElement) {
+      if (node.getAttribute) {
+        var ds = node.getAttribute('data-ds');
+        if (ds) {
+          var parsed = parseDataDs(ds);
+          if (parsed) return parsed;
+        }
+      }
+      node = node.parentElement;
+    }
+
+    var workDir = '/home/project/';
+    function strip(f) {
+      if (!f) return '';
+      return f.startsWith(workDir) ? f.slice(workDir.length) : f;
+    }
+
+    try {
+      var vNode = el;
+      while (vNode && vNode !== document.documentElement) {
+        var vc = vNode.__vueParentComponent;
+        if (vc && vc.type && vc.type.__file) {
+          return { sourceFilePath: strip(vc.type.__file), sourceLine: null, sourceColumn: null };
+        }
+        vNode = vNode.parentElement;
+      }
+    } catch (err) {
+      console.warn('[canvas-overlay] Vue fallback error:', err);
+    }
+
+    return null;
+  }
+
+  function clearOverlayState() {
+    hoveredEl = null;
+    selectedEl = null;
+    window.parent.postMessage({ type: 'canvas-hover-clear' }, '*');
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    if (!enabled) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el || el === hoveredEl) return;
+    hoveredEl = el;
+    window.parent.postMessage({
+      type: 'canvas-hover',
+      rect: getRect(el),
+      selector: getSelector(el),
+    }, '*');
+  }, true);
+
+  document.addEventListener('click', function(e) {
+    if (!enabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el) return;
+    selectedEl = el;
+    var source = getDebugSource(el);
+    window.parent.postMessage({
+      type: 'canvas-select',
+      rect: getRect(el),
+      selector: getSelector(el),
+      props: getComputedProps(el),
+      source: source,
+    }, '*');
+  }, true);
+
+  var syncSelectRaf = 0;
+  function postSelectedRectIfAny() {
+    if (!selectedEl) return;
+    if (!selectedEl.isConnected) {
+      selectedEl = null;
+      return;
+    }
+    window.parent.postMessage({
+      type: 'canvas-select-rect',
+      rect: getRect(selectedEl),
+    }, '*');
+  }
+  function scheduleSelectedRectSync() {
+    if (!enabled) return;
+    if (!selectedEl) return;
+    if (syncSelectRaf) return;
+    syncSelectRaf = requestAnimationFrame(function() {
+      syncSelectRaf = 0;
+      postSelectedRectIfAny();
+    });
+  }
+  window.addEventListener('scroll', scheduleSelectedRectSync, true);
+  window.addEventListener('resize', scheduleSelectedRectSync);
+
+  document.addEventListener('mouseleave', function() {
+    if (!enabled) return;
+    hoveredEl = null;
+    window.parent.postMessage({ type: 'canvas-hover-clear' }, '*');
+  });
+
+  window.addEventListener('message', function(e) {
+    if (e.source !== window.parent) return;
+    if (!e.data) return;
+    if (e.data.type === 'canvas-enable') {
+      enabled = true;
+    } else if (e.data.type === 'canvas-disable') {
+      enabled = false;
+      clearOverlayState();
+    } else if (e.data.type === 'canvas-deselect') {
+      selectedEl = null;
+    }
+  });
+
+  window.parent.postMessage({ type: 'canvas-overlay-ready' }, '*');
+
+  } catch (err) {
+    window.parent.postMessage({ type: 'canvas-overlay-error', message: String(err) }, '*');
+  }
+})();
+
+</script>
+</body>
+</html>
