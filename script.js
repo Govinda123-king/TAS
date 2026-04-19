@@ -27,6 +27,11 @@ const emptyState = document.getElementById('empty-state');
 const totalTasksSpan = document.getElementById('total-tasks');
 const completedTasksSpan = document.getElementById('completed-tasks');
 
+// Modal Elements
+const helpBtn = document.getElementById('help-btn');
+const helpModal = document.getElementById('help-modal');
+const closeModalBtn = document.getElementById('close-modal');
+
 // ==========================================
 // Initialization
 // ==========================================
@@ -42,6 +47,29 @@ renderTasks();
 // ==========================================
 form.addEventListener('submit', handleFormSubmit);
 cancelBtn.addEventListener('click', resetForm);
+
+// Modal Event Listeners
+helpBtn.addEventListener('click', () => {
+    helpModal.classList.remove('hidden');
+});
+
+closeModalBtn.addEventListener('click', () => {
+    helpModal.classList.add('hidden');
+});
+
+// Close modal when clicking outside the modal content
+helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) {
+        helpModal.classList.add('hidden');
+    }
+});
+
+// Close modal on Escape key press
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !helpModal.classList.contains('hidden')) {
+        helpModal.classList.add('hidden');
+    }
+});
 
 // ==========================================
 // Core Functions
